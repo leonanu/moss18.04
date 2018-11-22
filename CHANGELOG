@@ -1,0 +1,19 @@
+Moss18.04 Changelog
+
+!   Security fix and important improve;
+*   Common bug fix and improve;
++   Feature add;
+-   Feature remove;
+
+
+Note:
+1. MariaDB(MySQL) and Zabbix agent serives are still controled
+   by SystemV. To control the two services:
+   # service start|stop|restart mysqld
+   # service start|stop|restart zabbix_agentd
+
+
+1.0.0
+=====
+YYYY-MM-DD
+! Initial release;
