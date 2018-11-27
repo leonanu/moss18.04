@@ -65,104 +65,20 @@ if [ ! -z "${OS_ROOT_PASSWD}" ];then
     fi
 fi
 
-## %wheel users
-if ! grep '^ADD_USER_WHEEL' ${INST_LOG} > /dev/null 2>&1 ;then
-    if [ -n "${GROUP_WHEEL}" ];then
-        for ADD_USER_WHEEL in ${GROUP_WHEEL};do
-            id ${ADD_USER_WHEEL} >/dev/null 2>&1 || useradd -u ${USER_WHEEL_FROM} -G wheel ${ADD_USER_WHEEL}
-            if [ ! -f /home/${ADD_USER_WHEEL}/.passwd ];then
-                TMP_PASS=$(mkpasswd -s 0 -l 10)
-                echo ${TMP_PASS} | passwd --stdin ${ADD_USER_WHEEL}
-                echo ${TMP_PASS} > /home/${ADD_USER_WHEEL}/.passwd
-                chown root:root /home/${ADD_USER_WHEEL}/.passwd
-                chmod 400 /home/${ADD_USER_WHEEL}/.passwd
-            fi
-            if [ ! -d /home/${ADD_USER_WHEEL}/.ssh ];then
-                mkdir -m 0700 /home/${ADD_USER_WHEEL}/.ssh
-                if [ ${ADD_USER_WHEEL} != moss ];then
-                    if [ -f ${TOP_DIR}/etc/rsa_public_keys/${ADD_USER_WHEEL}.pub ];then
-                        install -m 0400 ${TOP_DIR}/etc/rsa_public_keys/${ADD_USER_WHEEL}.pub /home/${ADD_USER_WHEEL}/.ssh/authorized_keys
-                    fi
-                fi
-                chown ${ADD_USER_WHEEL}:${ADD_USER_WHEEL} -R /home/${ADD_USER_WHEEL}/.ssh
-            fi
-            USER_WHEEL_FROM=$(expr ${USER_WHEEL_FROM} + 1)
-        done
-    fi
-    ## log installed tag
-    echo 'ADD_USER_WHEEL' >> ${INST_LOG}
-fi
-
-## %sa users
-if ! grep '^ADD_USER_SA' ${INST_LOG} > /dev/null 2>&1 ;then
-    groupadd sa -g 3000
-    if [ -n "${GROUP_SA}" ];then
-        for ADD_USER_SA in ${GROUP_SA};do
-            id ${ADD_USER_SA} >/dev/null 2>&1 || useradd -u ${USER_SA_FROM} -G wheel ${ADD_USER_SA}
-            if [ ! -f /home/${ADD_USER_SA}/.passwd ];then
-                TMP_PASS=$(mkpasswd -s 0 -l 10)
-                echo ${TMP_PASS} | passwd --stdin ${ADD_USER_SA}
-                echo ${TMP_PASS} > /home/${ADD_USER_SA}/.passwd
-                chown root:root /home/${ADD_USER_SA}/.passwd
-                chmod 400 /home/${ADD_USER_SA}/.passwd
-            fi
-            if [ ! -d /home/${ADD_USER_SA}/.ssh ];then
-                mkdir -m 0700 /home/${ADD_USER_SA}/.ssh
-                if [ ${ADD_USER_SA} != moss ];then
-                    if [ -f ${TOP_DIR}/etc/rsa_public_keys/${ADD_USER_SA}.pub ];then
-                        install -m 0400 ${TOP_DIR}/etc/rsa_public_keys/${ADD_USER_SA}.pub /home/${ADD_USER_SA}/.ssh/authorized_keys
-                    fi
-                fi
-                chown ${ADD_USER_SA}:${ADD_USER_SA} -R /home/${ADD_USER_SA}/.ssh
-            fi
-            USER_SA_FROM=$(expr ${USER_SA_FROM} + 1)
-        done
-    fi
-    ## log installed tag
-    echo 'ADD_USER_SA' >> ${INST_LOG}
-fi
-
-## sudo
-if ! grep '^SUDO' ${INST_LOG} > /dev/null 2>&1 ;then
-    install -m 0440 --backup=numbered ${TOP_DIR}/conf/sudo/sudoers /etc/sudoers
-    ## log installed tag
-    echo 'SUDO' >> ${INST_LOG}
-fi
-    
 ## openssh
 if ! grep '^OPENSSH' ${INST_LOG} > /dev/null 2>&1 ;then
-    sed -r -i 's/^#?UseDNS.*/UseDNS no/g' /etc/ssh/sshd_config
-    sed -r -i 's/^#?PermitEmptyPasswords.*/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
-    sed -r -i 's/GSSAPIAuthentication.*/GSSAPIAuthentication no/g' /etc/ssh/ssh_config
-
     PUBKEY_NUM=$(ls -1 ${TOP_DIR}/etc/rsa_public_keys/*.pub 2>/dev/null | wc -l)
     PUBKEY_NUM_USER=$(ls -1 ${TOP_DIR}/etc/rsa_public_keys/*.pub 2>/dev/null | grep -v 'root.pub' | wc -l)
 
-    if [ ${SSH_PASS_AUTH} -eq 0 2>/dev/null ]; then
-        if [ ${PUBKEY_NUM} -eq 0 2>/dev/null ];then
-            warn_msg "ERROR!"
-            warn_msg "You want disable SSH password authentication."
-            warn_msg "But no user SSH public key found!"
-            warn_msg "You can not login system without user SSH key!"
-            warn_msg "Please put user SSH RSA public keys in ${TOP_DIR}/etc/rsa_public_keys!"
-            fail_msg "Moss installation terminated!"
-        fi
-        sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
+    if [ ${SSH_PASS_AUTH} -eq 1 2>/dev/null ]; then
+        sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
     fi
 
-    if [ ${SSH_ROOT_LOGIN} -eq 0 2>/dev/null ] && [ ${SSH_PASS_AUTH} -eq 0 2>/dev/null ]; then
-        if [ ${PUBKEY_NUM_USER} -eq 0 2>/dev/null ];then
-            warn_msg "ERROR!"
-            warn_msg "You want disable root login via SSH."
-            warn_msg "But no other user SSH public key found and password authentication was disabled!"
-            warn_msg "You need to allow SSH password authentication or put other common user SSH public"
-            warn_msg "key in ${TOP_DIR}/etc/rsa_public_keys!"
-            fail_msg "Moss installation terminated!"
-        fi
-        sed -r -i 's/^#?PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
+    if [ ${SSH_ROOT_LOGIN} -eq 1 2>/dev/null ] && [ ${SSH_PASS_AUTH} -eq 0 2>/dev/null ]; then
+        sed -r -i 's/^#?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config
     fi
 
-    /etc/rc.d/init.d/sshd restart
+    systemctl restart sshd.service
     ## log installed tag
     echo 'OPENSSH' >> ${INST_LOG}
 fi
