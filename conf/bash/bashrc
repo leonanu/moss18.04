@@ -1,5 +1,8 @@
 
 # Moss bashrc - START
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
 alias vi='vim'
 alias grep='grep --color'
 alias dstat='dstat -cdlmnpsy'

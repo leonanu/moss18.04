@@ -1,6 +1,5 @@
 
 " Moss vimrc - START
-syntax on
 set background=dark
 set hlsearch
 set showcmd

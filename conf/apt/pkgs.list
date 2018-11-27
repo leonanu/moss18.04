@@ -139,6 +139,7 @@ initramfs-tools-core
 install-info
 installation-report
 intel-microcode
+iotop
 iproute2
 iptables
 iptraf-ng
@@ -635,6 +636,7 @@ squashfs-tools
 ssh-import-id
 strace
 sudo
+sysstat
 systemd
 systemd-sysv
 sysvinit-utils

@@ -14,64 +14,34 @@ if ! grep '^SET_HOSTNAME' ${INST_LOG} > /dev/null 2>&1 ;then
     echo 'SET_HOSTNAME' >> ${INST_LOG}
 fi
 
-# optimize /etc/resolv.conf
-#if ! grep '^SET_RESOLV' ${INST_LOG} > /dev/null 2>&1 ;then
-#    if ! grep 'dns=none' /etc/NetworkManager/NetworkManager.conf > /dev/null 2>&1 ;then
-#        sed -i '/\[main\]/a\\dns=none' /etc/NetworkManager/NetworkManager.conf
-#    fi
-#    systemctl restart NetworkManager.service
-#    if ! grep 'timeout' /etc/resolv.conf > /dev/null 2>&1 ;then
-#        sed -i '1i\options timeout:1 attempts:1 rotate' /etc/resolv.conf
-#    fi
-#    systemctl restart NetworkManager.service
-#    ## log installed tag
-#    echo 'SET_RESOLV' >> ${INST_LOG}
-#fi
-
-# disable NetworkManager and optimize /etc/resolv.conf
-if ! grep '^SET_RESOLV' ${INST_LOG} > /dev/null 2>&1 ;then
-    systemctl stop NetworkManager.service
-    systemctl disable NetworkManager.service
-    if ! grep 'timeout' /etc/resolv.conf > /dev/null 2>&1 ;then
-        sed -i '1i\options timeout:1 attempts:1 rotate' /etc/resolv.conf
-    fi
-    systemctl restart NetworkManager.service
-    ## log installed tag
-    echo 'SET_RESOLV' >> ${INST_LOG}
-fi
-
 # do not bell on tab-completion
 if ! grep '^NO_BELL' ${INST_LOG} > /dev/null 2>&1 ;then
-    if ! grep '#set bell-style none' /etc/inputrc > /dev/null 2>&1 ;then
+    if ! grep '# set bell-style none' /etc/inputrc > /dev/null 2>&1 ;then
         sed -i '1i\set bell-style none' /etc/inputrc
     else
-        sed -i 's/^#set bell-style none/set bell-style none/g' /etc/inputrc
+        sed -i 's/^# set bell-style none/set bell-style none/g' /etc/inputrc
     fi
-    echo 'NO_BELL' >> ${INST_LOG}
-fi
 
-## selinux
-if ! grep '^SET_SELINUX' ${INST_LOG} > /dev/null 2>&1 ;then
-    sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config 
-    setenforce 0
-    ## log installed tag
-    echo 'SET_SELINUX' >> ${INST_LOG}
     NEED_REBOOT=1
+    ## log installed tag
+    echo 'NO_BELL' >> ${INST_LOG}
 fi
 
 ## bashrc settings
 if ! grep '^SET_BASHRC' ${INST_LOG} > /dev/null 2>&1 ;then
-    if ! grep 'Moss bashrc' /etc/bashrc > /dev/null 2>&1 ;then
-        cat ${TOP_DIR}/conf/bash/bashrc >> /etc/bashrc
+    if ! grep 'Moss bashrc' /etc/bash.bashrc > /dev/null 2>&1 ;then
+        cat ${TOP_DIR}/conf/bash/bashrc >> /etc/bash.bashrc
     fi
+
+    NEED_REBOOT=1
     ## log installed tag
     echo 'SET_BASHRC' >> ${INST_LOG}
 fi
 
 ## vimrc settings
 if ! grep '^SET_VIMRC' ${INST_LOG} > /dev/null 2>&1 ;then
-    if ! grep 'Moss vimrc' /etc/vimrc > /dev/null 2>&1 ;then
-        cat ${TOP_DIR}/conf/vi/vimrc >> /etc/vimrc
+    if ! grep 'Moss vimrc' /etc/vim/vimrc > /dev/null 2>&1 ;then
+        cat ${TOP_DIR}/conf/vi/vimrc >> /etc/vim/vimrc
     fi
     ## log installed tag
     echo 'SET_VIMRC' >> ${INST_LOG}
@@ -152,15 +122,6 @@ if ! grep '^ADD_USER_SA' ${INST_LOG} > /dev/null 2>&1 ;then
     echo 'ADD_USER_SA' >> ${INST_LOG}
 fi
 
-## genarate Moss key pair
-#if ! grep '^MOSS_KEY_PAIR' ${INST_LOG} > /dev/null 2>&1 ;then
-#    ssh-keygen -t rsa -N '' -C $OS_HOSTNAME -f /home/moss/.ssh/id_rsa
-#    chown -R moss.moss /home/moss/.ssh
-#    chmod 400 /home/moss/.ssh/id_rsa*
-#    ## log installed tag
-#    echo 'MOSS_KEY_PAIR' >> ${INST_LOG}
-#fi
-
 ## sudo
 if ! grep '^SUDO' ${INST_LOG} > /dev/null 2>&1 ;then
     install -m 0440 --backup=numbered ${TOP_DIR}/conf/sudo/sudoers /etc/sudoers
@@ -226,15 +187,7 @@ if ! grep '^SYSCTL' ${INST_LOG} > /dev/null 2>&1 ;then
     NEED_REBOOT=1
 fi
 
-## ipv6
-if ! grep '^NO_IPV6' ${INST_LOG} > /dev/null 2>&1 ;then
-    if [ ${IPV6_OFF} -eq 1 2>/dev/null ]; then
-        cat ${TOP_DIR}/conf/sysctl/no_ipv6.conf >> /etc/sysctl.conf
-    fi
-    ## log installed tag
-    echo 'NO_IPV6' >> ${INST_LOG}
-    NEED_REBOOT=1
-fi
+## Enable BBR
 
 ## System Handler
 if ! grep '^SYS_HANDLER' ${INST_LOG} > /dev/null 2>&1 ;then
