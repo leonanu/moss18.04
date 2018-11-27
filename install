@@ -110,8 +110,8 @@ if ! grep '^INST_WGET' ${INST_LOG} > /dev/null 2>&1 ;then
 fi
 
 ## Install development libs
-install_rpm () {
-    source ${TOP_DIR}/common/install_rpm.sh
+install_pkg () {
+    source ${TOP_DIR}/common/install_pkg.sh
 }
 
 ## Config System
@@ -161,18 +161,18 @@ uninstall () {
 
 case "${MOSS_OPT}" in
     1) # Init
-        install_rpm
+        install_pkg
         sysconfig
         ;;
     2) # WEB Server Only
         get_pkginfo
-        install_rpm
+        install_pkg
         sysconfig
         web
         ;;
     3) # WEB + PHP
         get_pkginfo
-        install_rpm
+        install_pkg
         sysconfig
         install_libs
         web
@@ -180,20 +180,20 @@ case "${MOSS_OPT}" in
         ;;
     4) # MySQL
         get_pkginfo
-        install_rpm
+        install_pkg
         sysconfig
         db
         ;;
     5) # NoSQL
         get_pkginfo
-        install_rpm
+        install_pkg
         sysconfig
         nosql 
         ;;
     6) # Zabbix Agent
         [ -z ${ZABBIX_SERVER_IP} ] && fail_msg "You MUST set ZABBIX_SERVER_IP in ${TOP_DIR}/etc/moss.conf!"
         get_pkginfo
-        install_rpm
+        install_pkg
         sysconfig
         zagent
         ;;
