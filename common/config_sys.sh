@@ -49,8 +49,8 @@ fi
 
 ## disable cron mail
 if ! grep '^CRON_MAIL' ${INST_LOG} > /dev/null 2>&1 ;then
-    if ! grep 'MAILTO' /var/spool/cron/root > /dev/null 2>&1 ;then
-        echo 'MAILTO=""' >> /var/spool/cron/root
+    if ! grep 'MAILTO' /var/spool/cron/crontabs/root > /dev/null 2>&1 ;then
+        echo 'MAILTO=""' >> /var/spool/cron/crontabs/root
     fi
     ## log installed tag
     echo 'CRON_MAIL' >> ${INST_LOG}
@@ -59,7 +59,7 @@ fi
 ## set root password
 if [ ! -z "${OS_ROOT_PASSWD}" ];then
     if ! grep '^SET_ROOT_PASSWORD' ${INST_LOG} > /dev/null 2>&1 ;then
-        echo ${OS_ROOT_PASSWD} | passwd --stdin root
+        echo "root:${OS_ROOT_PASSWD}" | chpasswd
         ## log installed tag
         echo 'SET_ROOT_PASSWORD' >> ${INST_LOG}
     fi
@@ -88,6 +88,7 @@ if ! grep '^PROFILE' ${INST_LOG} > /dev/null 2>&1 ;then
     install -m 0644 ${TOP_DIR}/conf/profile/history.sh /etc/profile.d/history.sh
     install -m 0644 ${TOP_DIR}/conf/profile/path.sh /etc/profile.d/path.sh
     install -m 0644 ${TOP_DIR}/conf/profile/locale.sh /etc/profile.d/locale.sh
+    NEED_REBOOT=1
     ## log installed tag
     echo 'PROFILE' >> ${INST_LOG}
 fi
@@ -97,13 +98,12 @@ if ! grep '^SYSCTL' ${INST_LOG} > /dev/null 2>&1 ;then
     if ! grep 'Moss sysctl' /etc/sysctl.conf > /dev/null 2>&1 ;then
         cat ${TOP_DIR}/conf/sysctl/sysctl.conf >> /etc/sysctl.conf
         sysctl -p
+        sysctl --system
     fi
     ## log installed tag
     echo 'SYSCTL' >> ${INST_LOG}
     NEED_REBOOT=1
 fi
-
-## Enable BBR
 
 ## System Handler
 if ! grep '^SYS_HANDLER' ${INST_LOG} > /dev/null 2>&1 ;then
@@ -124,22 +124,18 @@ fi
 
 ## system service
 if ! grep '^SYS_SERVICE' ${INST_LOG} > /dev/null 2>&1 ;then
-    for SVC_ON in atd.service auditd.service chronyd.service crond.service dbus.service irqbalance.service network.service nscd.service sshd.service rsyslog.service;do
+    for SVC_ON in atd.service cron.service dbus.service irqbalance.service networking.service networkd-dispatcher.service nscd.service ssh.service sshd.service rsyslog.service;do
         systemctl enable ${SVC_ON} 2>/dev/null
         systemctl start ${SVC_ON} 2>/dev/null
     done
 
-    for SVC_OFF in NetworkManager.service firewalld.service iptables.service ip6tables.service;do
-        systemctl disable ${SVC_OFF} 2>/dev/null
-        systemctl stop  ${SVC_OFF} stop 2>/dev/null
-    done
     ## log installed tag
     echo 'SYS_SERVICE' >> ${INST_LOG}
 fi
 
 ## enable rc-local service
 if ! grep '^RC-LOCAL' ${INST_LOG} > /dev/null 2>&1 ;then
-    chmod 755 /etc/rc.d/rc.local
+    chmod 755 /etc/rc.local
     systemctl enable rc-local.service
     systemctl start rc-local.service
     ## log installed tag
