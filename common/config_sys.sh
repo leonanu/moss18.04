@@ -21,7 +21,6 @@ if ! grep '^NO_BELL' ${INST_LOG} > /dev/null 2>&1 ;then
     else
         sed -i 's/^# set bell-style none/set bell-style none/g' /etc/inputrc
     fi
-
     NEED_REBOOT=1
     ## log installed tag
     echo 'NO_BELL' >> ${INST_LOG}
@@ -32,7 +31,6 @@ if ! grep '^SET_BASHRC' ${INST_LOG} > /dev/null 2>&1 ;then
     if ! grep 'Moss bashrc' /etc/bash.bashrc > /dev/null 2>&1 ;then
         cat ${TOP_DIR}/conf/bash/bashrc >> /etc/bash.bashrc
     fi
-
     NEED_REBOOT=1
     ## log installed tag
     echo 'SET_BASHRC' >> ${INST_LOG}
@@ -67,17 +65,15 @@ fi
 
 ## openssh
 if ! grep '^OPENSSH' ${INST_LOG} > /dev/null 2>&1 ;then
-    PUBKEY_NUM=$(ls -1 ${TOP_DIR}/etc/rsa_public_keys/*.pub 2>/dev/null | wc -l)
-    PUBKEY_NUM_USER=$(ls -1 ${TOP_DIR}/etc/rsa_public_keys/*.pub 2>/dev/null | grep -v 'root.pub' | wc -l)
-
     if [ ${SSH_PASS_AUTH} -eq 1 2>/dev/null ]; then
         sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
     fi
 
-    if [ ${SSH_ROOT_LOGIN} -eq 1 2>/dev/null ] && [ ${SSH_PASS_AUTH} -eq 0 2>/dev/null ]; then
+    if [ ${SSH_ROOT_LOGIN} -eq 1 2>/dev/null ]; then
         sed -r -i 's/^#?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config
     fi
 
+    systemctl restart ssh.service
     systemctl restart sshd.service
     ## log installed tag
     echo 'OPENSSH' >> ${INST_LOG}
@@ -128,7 +124,6 @@ if ! grep '^SYS_SERVICE' ${INST_LOG} > /dev/null 2>&1 ;then
         systemctl enable ${SVC_ON} 2>/dev/null
         systemctl start ${SVC_ON} 2>/dev/null
     done
-
     ## log installed tag
     echo 'SYS_SERVICE' >> ${INST_LOG}
 fi

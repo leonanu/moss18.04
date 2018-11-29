@@ -4,8 +4,8 @@ Moss18.04 is an automatic services environment deploy system for Ubuntu 18.04.
 
 You could set up a production environment easily by Moss18.04. Inlcude all features below:
 
-* **Optimize** - Automatic optimize Ubuntu 18.04 system. Change to faster apt repository mirror, optimize kernel TCP settings, vi improved, sudo policy, SSH optimize...;
-* **Security** - Turn off useless services, disable SSH password authentication, add users with SSH RSA keys accroding to user configuration;
+* **Optimize** - Automatic optimize Ubuntu 18.04 system. Change to faster apt repository mirror, optimize kernel TCP settings, vi improved, SSH optimize...;
+* **Security** - Turn off useless services, disable SSH password authentication;
 * **Services** - Automatic install Nginx/PHP FastCGI/PECL modules(Redis)/MySQL/Percona Xtrabackup/Redis/Zabbix Agent...;
 * **Performance** - All serives were set to optimized settings, you could use it in production environment directly;
 * **Maintenance** - User configure file support. Automatic set up database backup policy, logs rotate policy and all service were added to systemd;
