@@ -232,6 +232,7 @@ libfakeroot
 libfastjson4
 libfdisk1
 libffi6
+libffi-dev
 libfile-fcntllock-perl
 libfontconfig1
 libfontconfig1-dev
