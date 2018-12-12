@@ -36,6 +36,7 @@ if ! grep '^PHP$' ${INST_LOG} > /dev/null 2>&1 ;then
             --with-iconv \
             --with-xmlrpc \
             --with-pcre-regex \
+            --with-fpm-systemd \
             --without-pear \
             --enable-mysqlnd \
             --enable-fpm \
