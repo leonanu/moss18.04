@@ -136,3 +136,10 @@ if ! grep '^RC-LOCAL' ${INST_LOG} > /dev/null 2>&1 ;then
     ## log installed tag
     echo 'RC-LOCAL' >> ${INST_LOG}
 fi
+
+## create python symbol link for python3
+if ! grep '^PY_LINK' ${INST_LOG} > /dev/null 2>&1 ;then
+    ln -s /usr/bin/python3.6 /usr/bin/python
+    ## log installed tag
+    echo 'PY_LINK' >> ${INST_LOG}
+fi
