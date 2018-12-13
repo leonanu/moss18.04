@@ -32,6 +32,6 @@
             rm -f ${LOG_FULL_NAME}
         done
 
-        /bin/find /data/logs/dnsmasq/ -mtime +7 | xargs rm -rf
+        /usr/bin/find /data/logs/dnsmasq/ -mtime +7 | xargs rm -rf
     endscript
 }

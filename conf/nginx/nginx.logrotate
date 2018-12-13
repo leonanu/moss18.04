@@ -31,6 +31,6 @@
             rm -f ${LOG_FULL_NAME}
         done
 
-        /bin/find /var/log/nginx/ -mtime +30 | xargs rm -rf
+        /usr/bin/find /var/log/nginx/ -mtime +30 | xargs rm -rf
     endscript
 }
