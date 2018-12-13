@@ -52,7 +52,6 @@ crda
 cron
 cryptsetup
 cryptsetup-bin
-ctags
 curl
 dash
 dbus
@@ -201,7 +200,6 @@ libcap2
 libcap2-bin
 libcc1-0
 libcilkrts5
-libclang1-6.0
 libcom-err2
 libcomerr2
 libcryptsetup12
@@ -632,7 +630,6 @@ sed
 sensible-utils
 sgml-base
 shared-mime-info
-silversearcher-ag
 snap-confine
 snapd
 sntp
