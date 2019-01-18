@@ -20,7 +20,6 @@ set matchtime=5
 set ignorecase
 set incsearch
 set noexpandtab
-set whichwrap+=<,>,h,l
 set autoread
 set cursorline
 set cursorcolumn
