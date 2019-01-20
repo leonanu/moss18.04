@@ -130,7 +130,8 @@ fi
 
 ## enable rc-local service
 if ! grep '^RC-LOCAL' ${INST_LOG} > /dev/null 2>&1 ;then
-    chmod 755 /etc/rc.local
+    touch /etc/rc.local
+    chmod +x /etc/rc.local
     systemctl enable rc-local.service
     systemctl start rc-local.service
     ## log installed tag
