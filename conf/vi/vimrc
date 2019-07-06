@@ -19,7 +19,7 @@ set backspace=2
 set matchtime=5
 set ignorecase
 set incsearch
-set noexpandtab
+set expandtab
 set autoread
 set cursorline
 set cursorcolumn
