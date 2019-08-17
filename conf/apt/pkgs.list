@@ -379,8 +379,7 @@ libpcrecpp0v5
 libperl5.26
 libpipeline1
 libplymouth4
-libpng12-0
-libpng12-dev
+libpng-dev
 libpng16-16
 libpolkit-agent-1-0
 libpolkit-backend-1-0
