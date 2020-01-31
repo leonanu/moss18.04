@@ -11,7 +11,8 @@ Type=forking
 PIDFile=/tmp/redis.pid
 ExecStart=/usr/local/redis/bin/redis-server /usr/local/redis/etc/redis.conf
 ExecReload=/bin/kill -HUP $MAINPID
-Restart=no
+Restart=on-failure
+RestartSec=10s
 TimeoutSec=10
 
 [Install]
