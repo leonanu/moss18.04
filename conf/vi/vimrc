@@ -17,40 +17,12 @@ set scrolloff=5
 set fenc=utf-8
 set backspace=2
 set matchtime=5
-set ignorecase
+"set ignorecase
 set incsearch
 set expandtab
 set autoread
 set cursorline
 set cursorcolumn
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l/%L,%v][%p%%]
-
-map <F5> :call CompileRunGcc()<CR>
-func! CompileRunGcc()
-    |   exec "w"
-    |   if &filetype == 'c'
-    |   |   |   exec "!g++ % -o %<"
-    |   |   |   exec "!time ./%<"
-    |   elseif &filetype == 'cpp'
-    |   |   |   exec "!g++ % -o %<"
-    |   |   |   exec "!time ./%<"
-    |   elseif &filetype == 'java'
-    |   |   |   exec "!javac %"
-    |   |   |   exec "!time java %<"
-    |   elseif &filetype == 'sh'
-    |   |   |   :!time bash %
-    |   elseif &filetype == 'python'
-    |   |   |   exec "!clear"
-    |   |   |   exec "!time python3.7 %"
-    |   elseif &filetype == 'html'
-    |   |   |   exec "!firefox % &"
-    |   elseif &filetype == 'go'
-    |   |   |   " exec "!go build %<"
-    |   |   |   exec "!time go run %"
-    |   elseif &filetype == 'mkd'
-    |   |   |   exec "!~/.vim/markdown.pl % > %.html &"
-    |   |   |   exec "!firefox %.html &"
-    |   endif
-endfunc
 " Moss vimrc - END
 

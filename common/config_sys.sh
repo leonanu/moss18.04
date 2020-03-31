@@ -109,18 +109,37 @@ if ! grep '^SYS_HANDLER' ${INST_LOG} > /dev/null 2>&1 ;then
     NEED_REBOOT=1
 fi
 
-## nscd
-if ! grep '^NSCD' ${INST_LOG} > /dev/null 2>&1 ;then
-    cp -f /etc/nscd.conf /etc/nscd.conf.ori
-    install -m 0644 ${TOP_DIR}/conf/nscd/nscd.conf /etc/nscd.conf
-    systemctl restart nscd
+## Disable IPv6
+if ! grep 'IPv6_OFF' ${INST_LOG} > /dev/null 2>&1 ;then
+    cat ${TOP_DIR}/conf/sysctl/no_ipv6.conf >> /etc/sysctl.conf
+    sysctl -p
+    sysctl --system
     ## log installed tag
-    echo 'NSCD' >> ${INST_LOG}
+    echo 'IPv6_OFF' >> ${INST_LOG}
+    NEED_REBOOT=1
 fi
+
+## timesyncd
+if ! grep '^TIMESYNCD' ${INST_LOG} > /dev/null 2>&1 ;then
+    mv -f /etc/systemd/timesyncd.conf /etc/systemd/timesyncd.conf.ori
+    install -m 0644 ${TOP_DIR}/conf/timesyncd/timesyncd.conf /etc/systemd/timesyncd.conf
+    systemctl restart systemd-timesyncd.service
+    ## log installed tag
+    echo 'TIMESYNCD' >> ${INST_LOG}
+#fi
+
+## nscd
+#if ! grep '^NSCD' ${INST_LOG} > /dev/null 2>&1 ;then
+#    cp -f /etc/nscd.conf /etc/nscd.conf.ori
+#    install -m 0644 ${TOP_DIR}/conf/nscd/nscd.conf /etc/nscd.conf
+#    systemctl restart nscd
+#    ## log installed tag
+#    echo 'NSCD' >> ${INST_LOG}
+#fi
 
 ## system service
 if ! grep '^SYS_SERVICE' ${INST_LOG} > /dev/null 2>&1 ;then
-    for SVC_ON in atd.service cron.service dbus.service irqbalance.service networking.service networkd-dispatcher.service nscd.service ssh.service sshd.service rsyslog.service;do
+    for SVC_ON in atd.service cron.service dbus.service irqbalance.service networking.service networkd-dispatcher.service ssh.service sshd.service rsyslog.service systemd-resolved.service systemd-timesyncd.service;do
         systemctl enable ${SVC_ON} 2>/dev/null
         systemctl start ${SVC_ON} 2>/dev/null
     done
