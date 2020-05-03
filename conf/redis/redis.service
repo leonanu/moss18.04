@@ -6,10 +6,10 @@ Wants=network.target
 
 [Service]
 LimitNOFILE=51200
-User=redis
 Type=forking
 PIDFile=/tmp/redis.pid
-ExecStart=/usr/local/redis/bin/redis-server /usr/local/redis/etc/redis.conf
+ExecStartPre=/bin/bash -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+ExecStart=/usr/local/redis/bin/redis-server /usr/local/redis/conf/redis.conf
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=10s

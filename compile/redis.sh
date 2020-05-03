@@ -19,7 +19,7 @@ if ! grep '^REDIS$' ${INST_LOG} > /dev/null 2>&1 ;then
     sed -ri "s#^PREFIX.*#PREFIX=${INST_DIR}/${SRC_DIR}#" ${STORE_DIR}/${SRC_DIR}/src/Makefile
     compile
     
-    mkdir ${INST_DIR}/${SRC_DIR}/etc
+    mkdir ${INST_DIR}/${SRC_DIR}/conf
 
 ## for install config files
     SYMLINK='/usr/local/redis'
@@ -27,14 +27,10 @@ if ! grep '^REDIS$' ${INST_LOG} > /dev/null 2>&1 ;then
     echo ${RDS_PASS} > /root/.moss/redis.pass
     chmod 600 /root/.moss/redis.pass
     succ_msg "Begin to install ${SRC_DIR} config files"
-    ## user add
-    id redis >/dev/null 2>&1 || useradd redis -u 1003 -M -s /sbin/nologin
     ## data dir
     [ ! -d ${RDS_DATA_DIR} ] && mkdir -m 0755 -p ${RDS_DATA_DIR}
-    chown redis:redis -R ${RDS_DATA_DIR}
     ## log dir
     [ ! -d '/var/log/redis' ] && mkdir -m 0755 -p /var/log/redis
-    chown redis:redis -R /var/log/redis
     ## conf
     RD_ROLE_TMP=0
     while [ ${RD_ROLE_TMP} -eq 0 ]; do
@@ -59,11 +55,8 @@ if ! grep '^REDIS$' ${INST_LOG} > /dev/null 2>&1 ;then
             warn_msg "Invalid option. Type m or s to continue."
         fi
     done
-    ## THP
-    echo never > /sys/kernel/mm/transparent_hugepage/enabled
-    echo 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.local
     ## base dir
-    chown redis:redis -R ${INST_DIR}/${SRC_DIR}
+    chown root:root -R ${INST_DIR}/${SRC_DIR}
     ## init scripts
     install -m 0644 ${TOP_DIR}/conf/redis/redis.service /usr/lib/systemd/system/redis.service
     systemctl daemon-reload
